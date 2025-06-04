@@ -13,7 +13,7 @@ import java.util.Objects;
 public abstract class Transaction {
 
     private final LocalDate date;
-    private final String description;
+    private final String    description;
     private final BigDecimal amount;
 
     /**
@@ -34,9 +34,9 @@ public abstract class Transaction {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("L'ammontare non può essere nullo o negativo");
         }
-        this.date = date;
+        this.date        = date;
         this.description = description;
-        this.amount = amount;
+        this.amount      = amount;
     }
 
     /** @return la data della transazione */

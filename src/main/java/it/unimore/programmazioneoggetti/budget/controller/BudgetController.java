@@ -218,6 +218,8 @@ public class BudgetController {
     /**
      * Listener per la voce di menu “Salva CSV”: apre un {@link JFileChooser} per
      * selezionare il file di destinazione, poi salva le transazioni correnti in CSV.
+     *
+     * @brief Se il file esiste già, chiede conferma all’utente prima di sovrascrivere.
      */
     private class SaveButtonListener implements ActionListener {
         @Override
@@ -228,15 +230,36 @@ public class BudgetController {
             int userSelection = chooser.showSaveDialog(view);
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = chooser.getSelectedFile();
+                // Assicurati che termini con .csv
                 if (!fileToSave.getName().toLowerCase().endsWith(".csv")) {
                     fileToSave = new File(fileToSave.getParentFile(), fileToSave.getName() + ".csv");
                 }
+
+                // Se il file esiste già, chiedi conferma prima di sovrascrivere
+                if (fileToSave.exists()) {
+                    int overwrite = JOptionPane.showConfirmDialog(
+                            view,
+                            "Il file \"" + fileToSave.getName() + "\" esiste già.\nVuoi sovrascriverlo?",
+                            "Conferma Sovrascrittura",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                    if (overwrite != JOptionPane.YES_OPTION) {
+                        // L’utente ha scelto di non sovrascrivere: esci subito
+                        return;
+                    }
+                }
+
                 try {
                     FileUtil.saveAsCSV(model.getAllTransactions(), fileToSave);
                     JOptionPane.showMessageDialog(view, "Salvataggio CSV completato!");
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(view, "Errore durante il salvataggio: " + ex.getMessage(),
-                            "Errore IO", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            view,
+                            "Errore durante il salvataggio: " + ex.getMessage(),
+                            "Errore IO",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         }
@@ -348,4 +371,5 @@ public class BudgetController {
             }
         }
     }
+
 }

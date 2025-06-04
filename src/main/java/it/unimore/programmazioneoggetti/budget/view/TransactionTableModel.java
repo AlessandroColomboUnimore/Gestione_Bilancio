@@ -1,4 +1,5 @@
 package it.unimore.programmazioneoggetti.budget.view;
+import java.math.BigDecimal;
 
 import it.unimore.programmazioneoggetti.budget.model.Transaction;
 
@@ -8,25 +9,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TableModel personalizzato per mostrare una lista di {@link Transaction} in una {@link JTable}.
- * Definisce tre colonne: data, descrizione e importo (con segno).
+ * TableModel personalizzato per mostrare una lista di Transaction in una JTable.
  */
 public class TransactionTableModel extends AbstractTableModel {
 
     private final List<Transaction> transactions;
     private final String[] columnNames = {"Data", "Descrizione", "Importo"};
+
+    // Formatter per visualizzare LocalDate in formato leggibile (dd/MM/yyyy)
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /** Costruisce un modello vuoto, pronto per essere popolato con {@code setTransactions(...) }. */
     public TransactionTableModel() {
         this.transactions = new ArrayList<>();
     }
 
     /**
-     * Sostituisce la lista corrente di transazioni e notifica alla JTable
-     * di rinfrescare i dati.
+     * Aggiorna l'intera lista di transazioni e notifica la JTable di rinfrescare.
      *
-     * @param list lista di {@link Transaction} da mostrare (può essere null)
+     * @param list lista di Transaction da mostrare
      */
     public void setTransactions(List<Transaction> list) {
         transactions.clear();
@@ -52,34 +52,33 @@ public class TransactionTableModel extends AbstractTableModel {
     }
 
     /**
-     * Ritorna il valore da mostrare nella cella specificata.
-     * Colonna 0 → data formattata, 1 → descrizione, 2 → importo con segno.
-     *
-     * @param rowIndex    indice di riga
-     * @param columnIndex indice di colonna
-     * @return oggetto da visualizzare nella cella
+     * Ritorna il valore da mostrare nella cella [rowIndex, columnIndex].
+     * Col 0 = Data (formattata), Col 1 = Descrizione, Col 2 = Importo con segno.
      */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Transaction t = transactions.get(rowIndex);
         switch (columnIndex) {
             case 0:
+                // format da LocalDate in dd/MM/yyyy
                 return t.getDate().format(dateFormatter);
             case 1:
                 return t.getDescription();
             case 2:
-                return t.signedAmount().toString();
+                // mostriamo signedAmount() come stringa, es. "-600.00" o "+1500.00"
+                BigDecimal signed = t.signedAmount();
+                return signed.toString();
             default:
                 return null;
         }
     }
 
     /**
-     * Restituisce la transazione corrispondente a una riga specifica,
-     * utile per operazioni di modifica o eliminazione.
+     * Restituisce la Transaction corrispondente a una riga della tabella.
+     * Utile per conoscere quale oggetto rimuovere o modificare.
      *
-     * @param rowIndex indice di riga
-     * @return {@link Transaction} alla riga specificata, oppure null se l’indice non è valido
+     * @param rowIndex indice di riga selezionata
+     * @return Transaction associata a rowIndex, oppure null se rowIndex invalido
      */
     public Transaction getTransactionAt(int rowIndex) {
         if (rowIndex < 0 || rowIndex >= transactions.size()) {
