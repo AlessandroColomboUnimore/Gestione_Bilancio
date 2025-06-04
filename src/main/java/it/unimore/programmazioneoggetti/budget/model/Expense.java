@@ -4,24 +4,27 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Rappresenta una spesa nel bilancio.
+ * Rappresenta una spesa nel bilancio. Estende {@link Transaction} e
+ * sovrascrive il metodo {@code signedAmount()} per restituire l’importo
+ * con segno negativo.
  */
 public class Expense extends Transaction {
 
     /**
-     * Costruttore di Expense.
+     * Costruisce una nuova spesa.
      *
-     * @param date        Data della spesa
-     * @param description Descrizione della spesa
-     * @param amount      Ammontare (positivo) ma tornerà come negativo in signedAmount()
+     * @param date        data della spesa
+     * @param description descrizione della spesa
+     * @param amount      importo (valore positivo, verrà reso negativo in {@code signedAmount()})
      */
     public Expense(LocalDate date, String description, BigDecimal amount) {
         super(date, description, amount);
     }
 
     /**
-     * Per una spesa, il valore "signed" deve essere negativo
-     * (es: -100.00).
+     * Ritorna l’importo negativo per indicare una spesa (uscita).
+     *
+     * @return valore negativo di {@code getAmount()}
      */
     @Override
     public BigDecimal signedAmount() {

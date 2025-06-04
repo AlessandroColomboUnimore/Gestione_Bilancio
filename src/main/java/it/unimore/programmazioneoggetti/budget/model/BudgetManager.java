@@ -7,52 +7,59 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Classe che gestisce l'elenco di tutte le transazioni (entrate e spese).
- * Implementa metodi per aggiungere, rimuovere, modificare, filtrare e calcolare saldi.
+ * Gestisce tutte le transazioni del bilancio: aggiunta, rimozione, ricerca
+ * e calcolo del saldo totale. Mantiene una lista interna immutabile di
+ * {@link Transaction}.
  */
 public class BudgetManager {
 
-    // 1) Incapsuliamo la collezione: List<Transaction>
     private final List<Transaction> transactions;
 
     /**
-     * Costruttore: inizializza la lista vuota.
+     * Costruisce un nuovo BudgetManager con lista vuota di transazioni.
      */
     public BudgetManager() {
         this.transactions = new ArrayList<>();
     }
 
     /**
-     * Aggiunge una nuova transazione (entrata o spesa).
+     * Aggiunge una nuova transazione. Se il parametro è {@code null}, lancia
+     * IllegalArgumentException.
+     *
      * @param t transazione da aggiungere (non null)
+     * @throws IllegalArgumentException se {@code t} è null
      */
     public void addTransaction(Transaction t) {
-        if (t == null) {
-            throw new IllegalArgumentException("La transazione non può essere nulla");
-        }
+        if (t == null) throw new IllegalArgumentException("La transazione non può essere nulla");
         transactions.add(t);
     }
 
     /**
-     * Rimuove una transazione esistente.
+     * Rimuove una transazione esistente. Restituisce true se l’ha rimossa,
+     * false se non era presente.
+     *
      * @param t transazione da rimuovere
-     * @return true se rimossa con successo, false altrimenti
+     * @return {@code true} se rimossa con successo, {@code false} altrimenti
      */
     public boolean removeTransaction(Transaction t) {
         return transactions.remove(t);
     }
 
     /**
-     * Restituisce la lista (non modificabile direttamente) di tutte le transazioni correnti.
-     * Usiamo List.copyOf() per evitare che clienti del metodo modifichino la lista interna.
+     * Ritorna una copia della lista di tutte le transazioni correnti.
+     * In questo modo la lista interna rimane protetta.
+     *
+     * @return lista immutabile di {@link Transaction}
      */
     public List<Transaction> getAllTransactions() {
         return List.copyOf(transactions);
     }
 
     /**
-     * Calcola il saldo complessivo (somma algebrica di tutte le transazioni).
-     * Entrate positive, spese negative.
+     * Calcola il saldo totale delle transazioni: somma degli importi con segno
+     * (le uscite sono negative, le entrate positive).
+     *
+     * @return saldo totale come BigDecimal
      */
     public BigDecimal calculateTotalBalance() {
         return transactions.stream()
@@ -61,9 +68,10 @@ public class BudgetManager {
     }
 
     /**
-     * Filtra le transazioni in un singolo giorno.
-     * @param date giorno da filtrare
-     * @return lista di transazioni con data pari a 'date'
+     * Filtra e restituisce tutte le transazioni avvenute in una data specifica.
+     *
+     * @param date data di ricerca
+     * @return lista di transazioni con {@code t.getDate().isEqual(date)}
      */
     public List<Transaction> getByDate(LocalDate date) {
         return transactions.stream()
@@ -72,16 +80,15 @@ public class BudgetManager {
     }
 
     /**
-     * Filtra le transazioni in un intervallo di date (inclusivo).
-     * @param from data di inizio (inclusiva)
-     * @param to   data di fine (inclusiva)
-     * @return lista di transazioni nell'intervallo
+     * Filtra e restituisce le transazioni comprese nell’intervallo [from, to].
+     *
+     * @param from data di inizio (inclusa)
+     * @param to   data di fine (inclusa)
+     * @return lista di transazioni che cadono nel range specificato
      */
     public List<Transaction> getByDateRange(LocalDate from, LocalDate to) {
         return transactions.stream()
                 .filter(t -> !t.getDate().isBefore(from) && !t.getDate().isAfter(to))
                 .collect(Collectors.toList());
     }
-
-    // (Opzionale: filtri per settimana, mese, anno, ma possiamo usare getByDateRange)
 }

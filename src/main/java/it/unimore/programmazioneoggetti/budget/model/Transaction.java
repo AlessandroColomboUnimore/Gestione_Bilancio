@@ -5,25 +5,26 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Rappresenta una voce di bilancio (astratta).
- * Contiene data, descrizione e ammontare.
+ * Classe astratta che rappresenta una voce generica di bilancio.
+ * Ogni transazione ha data, descrizione e importo (positivo).
+ * Le sottoclassi {@link Income} e {@link Expense} definiscono
+ * come calcolare {@link #signedAmount()} (segno positivo o negativo).
  */
 public abstract class Transaction {
 
-    // 1) Incapsulamento: rendiamo i campi 'private'
-    private LocalDate date;
-    private String description;
-    private BigDecimal amount;
+    private final LocalDate date;
+    private final String description;
+    private final BigDecimal amount;
 
     /**
-     * Costruttore base di Transaction.
+     * Costruisce una nuova transazione.
      *
-     * @param date        Data della transazione (non null)
-     * @param description Descrizione (non vuota)
-     * @param amount      Importo (BigDecimal, positivo)
+     * @param date        data della transazione (non null)
+     * @param description descrizione (non nulla, non vuota)
+     * @param amount      importo (BigDecimal, positivo)
+     * @throws IllegalArgumentException se uno dei parametri non è valido
      */
     public Transaction(LocalDate date, String description, BigDecimal amount) {
-        // Validazione minima per garantire correttezza dati
         if (date == null) {
             throw new IllegalArgumentException("La data non può essere nulla");
         }
@@ -33,31 +34,31 @@ public abstract class Transaction {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("L'ammontare non può essere nullo o negativo");
         }
-
         this.date = date;
         this.description = description;
         this.amount = amount;
     }
 
-    // 2) Getter per tutti i campi (nessun setter, rendiamo Transaction IMMUTABILE dopo la creazione)
+    /** @return la data della transazione */
     public LocalDate getDate() {
         return date;
     }
 
+    /** @return la descrizione della transazione */
     public String getDescription() {
         return description;
     }
 
+    /** @return l'importo (valore positivo) */
     public BigDecimal getAmount() {
         return amount;
     }
 
     /**
-     * Metodo tripolare: definisce il segno del valore nella tabella.
-     * Sottoclassi (Income o Expense) potranno implementare un comportamento differente
-     * se necessario (polimorfismo).
+     * Definisce il valore “con segno” della transazione:
+     * sottoclassi implementano logiche diverse (entrate positive, uscite negative).
      *
-     * @return valore numerico con segno (+ per entrate, - per uscite).
+     * @return importo con segno
      */
     public abstract BigDecimal signedAmount();
 

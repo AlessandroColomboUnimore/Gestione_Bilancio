@@ -4,23 +4,27 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Rappresenta un'entrata nel bilancio.
+ * Rappresenta un’entrata nel bilancio. Estende {@link Transaction} e
+ * sovrascrive il metodo {@code signedAmount()} per restituire l’importo
+ * con segno positivo.
  */
 public class Income extends Transaction {
 
     /**
-     * Costruttore di Income.
+     * Costruisce una nuova entrata.
      *
-     * @param date        Data dell'entrata
-     * @param description Descrizione dell'entrata
-     * @param amount      Ammontare (positivo)
+     * @param date        data dell’entrata
+     * @param description descrizione dell’entrata
+     * @param amount      importo (valore positivo)
      */
     public Income(LocalDate date, String description, BigDecimal amount) {
         super(date, description, amount);
     }
 
     /**
-     * Per un'entrata, il valore "signed" è positivo.
+     * Ritorna l’importo positivo per indicare un’entrata.
+     *
+     * @return {@code getAmount()} (valore positivo)
      */
     @Override
     public BigDecimal signedAmount() {
